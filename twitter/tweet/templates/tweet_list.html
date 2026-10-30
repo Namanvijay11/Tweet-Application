@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}
+    Tweet
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">Welcome to the Tweet page!</h1>
+
+<a class = "btn btn-primary mb-4" href="{% url 'tweet_create' %}">Create a tweet</a>
+<div class="continer row gap-3">
+    {% for tweet in tweets %}
+    <div class="card" style="width: 18rem;">
+        <img src="{{tweet.photo.url}}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">{{tweet.user.username}}</h5>
+            <p class="card-text">{{tweet.text}}</p>
+            
+<div class="d-flex align-items-center gap-2 mt-3">
+    {% if user.is_authenticated %}
+
+        <form method="POST"
+              action="{% url 'toggle_like' tweet.id %}">
+            {% csrf_token %}
+
+            <input type="hidden" name="next"
+                   value="{{ request.get_full_path }}">
+
+            {% if tweet.id in liked_tweet_ids %}
+                <button type="submit"
+                        class="btn btn-danger btn-sm">
+                    ♥ Unlike
+                </button>
+            {% else %}
+                <button type="submit"
+                        class="btn btn-outline-danger btn-sm">
+                    ♡ Like
+                </button>
+            {% endif %}
+        </form>
+
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-danger btn-sm">
+            ♡ Login to Like
+        </a>
+    {% endif %}
+
+    <span>{{ tweet.likes.count }} likes</span>
+</div>
+
+            {%if tweet.user == user%}
+            <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-primary">Edit</a>
+            <a href="{% url 'tweet_delete' tweet.id %}" class="btn btn-danger">Delete</a>
+            {%endif%}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
